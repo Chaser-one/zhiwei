@@ -1,0 +1,1 @@
+body{margin:0}.chat-wrapper{position:relative;width:100vw;height:100vh;overflow-x:hidden}.content-area{width:100vw;height:calc(100vh - 64px)}.select-img{position:relative;line-height:40px;overflow:hidden}.tool-bar{position:fixed;box-sizing:border-box;bottom:10px;left:0;height:40px;width:100%}.msg-item{margin-bottom:20px}.msg-item:after{content:"";display:block;clear:both}
