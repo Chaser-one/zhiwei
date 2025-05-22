@@ -36,6 +36,9 @@ export default {
   methods:{
     getBlogData(){
       BlogService.getMyBlog(this.params).then(rs=>{
+        if(rs.data.status !== 200){
+          return
+        }
         this.totalNum = rs.data.data.totalNum
         this.blogList = rs.data.data.blogList
       })

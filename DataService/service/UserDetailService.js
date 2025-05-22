@@ -170,14 +170,32 @@ userDetailApp.delete('/blacklist/:userName', function (req, res) {
 })
 
 userDetailApp.get('/comment', function (req, res) {
-  let {offset, limit} = req.query; // 获取查询参数
+  let { offset = 0, limit = 10 } = req.query; // 增加默认值，防止未传参
+  offset = Number(offset);
+  limit = Number(limit);
+
   UserTables.find({
     token: req.headers.authorization
   }).then((rs) => {
+    if (!rs || rs.length === 0) {
+      return res.send({
+        status: 401,
+        message: '未找到用户，请重新登录'
+      });
+    }
     UserDetailTables.find({
       key: rs[0].key
     }).then((comments) => {
-      console.log(offset, limit)
+      if (!comments || comments.length === 0 || !comments[0].comments) {
+        return res.send({
+          status: 200,
+          message: '暂无评论',
+          data: {
+            commentList: [],
+            totalNum: 0
+          }
+        });
+      }
       let commentList = comments[0].comments.slice(offset, offset + limit);
       res.send({
         status: 200,
@@ -186,25 +204,54 @@ userDetailApp.get('/comment', function (req, res) {
           commentList,
           totalNum: comments[0].comments.length
         }
-      })
+      });
     }).catch(err => {
       res.send({
         status: 500,
         message: '获取个人评论失败'
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});
 
 userDetailApp.get('/attention', function (req, res) {
-  let {offset, limit} = req.query; // 获取查询参数
+  let { offset = 0, limit = 10 } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+
   UserTables.find({
     token: req.headers.authorization
   }).then((rs) => {
+    if (!rs || rs.length === 0) {
+      return res.send({
+        status: 401,
+        message: '未找到用户，请重新登录'
+      });
+    }
     UserDetailTables.find({
       key: rs[0].key
     }).then((attentions) => {
+      if (!attentions || attentions.length === 0 || !attentions[0].attentions) {
+        return res.send({
+          status: 200,
+          message: '暂无关注',
+          data: {
+            attentionList: [],
+            totalNum: 0
+          }
+        });
+      }
       let attentionList = attentions[0].attentions.slice(offset, offset + limit);
+      if (attentionList.length === 0) {
+        return res.send({
+          status: 200,
+          message: '暂无关注',
+          data: {
+            attentionList: [],
+            totalNum: attentions[0].attentions.length
+          }
+        });
+      }
       UserTables.find({
         userName: {
           $in: attentionList
@@ -213,34 +260,63 @@ userDetailApp.get('/attention', function (req, res) {
         userName: true,
         avatar: true,
         introduction: true
-      }).then(rs => {
+      }).then(rs2 => {
         res.send({
           status: 200,
           message: '获取个人关注成功',
           data: {
-            attentionList: rs,
+            attentionList: rs2,
             totalNum: attentions[0].attentions.length
           }
-        })
-      })
+        });
+      });
     }).catch(err => {
       res.send({
         status: 500,
         message: '获取个人关注失败'
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});
 
 userDetailApp.get('/blacklist', function (req, res) {
-  let {offset, limit} = req.query; // 获取查询参数
+  let { offset = 0, limit = 10 } = req.query;
+  offset = Number(offset);
+  limit = Number(limit);
+
   UserTables.find({
     token: req.headers.authorization
   }).then((rs) => {
+    if (!rs || rs.length === 0) {
+      return res.send({
+        status: 401,
+        message: '未找到用户，请重新登录'
+      });
+    }
     UserDetailTables.find({
       key: rs[0].key
     }).then((blacklists) => {
+      if (!blacklists || blacklists.length === 0 || !blacklists[0].blacklist) {
+        return res.send({
+          status: 200,
+          message: '暂无黑名单',
+          data: {
+            blacklist: [],
+            totalNum: 0
+          }
+        });
+      }
       let blacklist = blacklists[0].blacklist.slice(offset, offset + limit);
+      if (blacklist.length === 0) {
+        return res.send({
+          status: 200,
+          message: '暂无黑名单',
+          data: {
+            blacklist: [],
+            totalNum: blacklists[0].blacklist.length
+          }
+        });
+      }
       UserTables.find({
         userName: {
           $in: blacklist
@@ -249,24 +325,24 @@ userDetailApp.get('/blacklist', function (req, res) {
         userName: true,
         avatar: true,
         introduction: true
-      }).then(rs => {
+      }).then(rs2 => {
         res.send({
           status: 200,
           message: '获取个人黑名单成功',
           data: {
-            blacklist: rs,
+            blacklist: rs2,
             totalNum: blacklists[0].blacklist.length
           }
-        })
-      })
+        });
+      });
     }).catch(err => {
       res.send({
         status: 500,
         message: '获取个人黑名单失败'
-      })
-    })
-  })
-})
+      });
+    });
+  });
+});
 module.exports = {
   userDetailApp
 }

@@ -7,7 +7,7 @@
       </div>
       <el-row :gutter="10">
        <el-col :span="24" style="display: flex;justify-content: center">
-         <el-image :src="articleData.cover" style="height: 450px">
+         <el-image :src="articleData.cover"  style="height: 150px">
            <div slot="placeholder" class="image-slot">
              加载中<span class="dot">...</span>
            </div>
@@ -24,7 +24,7 @@
       </el-row>
       <el-row :gutter="10">
        <el-col :span="2">
-         <el-avatar :src="articleData.author.avatar"  style="width: auto"></el-avatar>
+         <el-avatar :src="articleData.author.avatar"  size="large" fit="cover"></el-avatar>
        </el-col>
         <el-col :span="4">
           <p>{{articleData.lastModified | transformTime}}</p>

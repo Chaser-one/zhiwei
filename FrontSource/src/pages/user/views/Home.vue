@@ -22,7 +22,7 @@
                 :src="userData.avatar"
                 :title="userData.userName"
                 shape="square"
-                fit="cover"
+                fit="scale-down"
             >
             </el-avatar>
             <el-dropdown-menu slot="dropdown">

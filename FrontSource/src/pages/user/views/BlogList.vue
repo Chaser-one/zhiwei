@@ -148,6 +148,9 @@ export default {
     },
     getBlogData(){
       BlogService.getPublicBlog(this.searchParams).then(rs => {
+        if(rs.data.status !== 200){
+          return
+        }
         this.blogList = rs.data.data.blogList
         this.totalNum = rs.data.data.totalNum
       })

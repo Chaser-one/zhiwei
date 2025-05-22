@@ -1,3 +1,4 @@
+const isProduction = process.env.NODE_ENV === 'production';
 module.exports = {
     publicPath: './',
     outputDir: 'site',
@@ -39,7 +40,7 @@ module.exports = {
         }
     },
     configureWebpack: {
-        // devtool: 'source-map'
+        devtool: 'source-map'
         // devServer: {
         //     historyApiFallback: {
         //         verbose: true,
@@ -52,5 +53,5 @@ module.exports = {
         // }
 
     },
-    productionSourceMap: false
+    productionSourceMap: isProduction
 }

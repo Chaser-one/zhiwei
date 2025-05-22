@@ -58,6 +58,9 @@ export default {
   methods: {
     getBlogData() {
       UserDetailService.getBlackList(this.params).then(rs => {
+        if(rs.data.status !== 200){
+          return
+        }
         this.totalNum = rs.data.data.totalNum
         this.blacklist = rs.data.data.blacklist
       })

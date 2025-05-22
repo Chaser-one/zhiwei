@@ -1,18 +1,12 @@
 <template>
   <div>
-    <el-page-header
-        @back="goBack"
-        :content="blogData.title"
-    >
+    <el-page-header @back="goBack" :content="blogData.title">
     </el-page-header>
     <el-card class="box-card" style="margin-top: 20px">
       <div slot="header" class="clearfix">
         <el-row :gutter="10">
           <el-col :span="2">
-            <el-avatar
-                :src="blogData.author.avatar"
-                size="large"
-            >
+            <el-avatar :src="blogData.author.avatar" size="large">
             </el-avatar>
           </el-col>
           <el-col :span="6">
@@ -22,23 +16,14 @@
           </el-col>
           <el-col :span="8" :offset="8">
             <el-button type="warning"
-                       :icon="userData.userDetail.likes.includes(blogId)?'el-icon-star-on':'el-icon-star-off'"
-                       circle
-                       @click="switchLike"
-            ></el-button>
-            <el-button
-                type="primary"
-                :icon="userData.userDetail.attentions.includes(blogData.author.userName)?'el-icon-check':'el-icon-plus'"
-                v-if="!(blogData.author.userName === userData.userName)"
-                @click="switchAttentions"
-            >关注
+              :icon="userData.userDetail.likes.includes(blogId) ? 'el-icon-star-on' : 'el-icon-star-off'" circle
+              @click="switchLike"></el-button>
+            <el-button type="primary"
+              :icon="userData.userDetail.attentions.includes(blogData.author.userName) ? 'el-icon-check' : 'el-icon-plus'"
+              v-if="!(blogData.author.userName === userData.userName)" @click="switchAttentions">关注
             </el-button>
-            <el-button
-                type="danger"
-                icon="el-icon-s-custom"
-                v-if="!(blogData.author.userName===userData.userName)"
-                @click="switchBlackList"
-            >
+            <el-button type="danger" icon="el-icon-s-custom" v-if="!(blogData.author.userName === userData.userName)"
+              @click="switchBlackList">
               {{ userData.userDetail.blacklist.includes(blogData.author.userName) ? '已拉黑' : '拉黑' }}
             </el-button>
             <el-button type="danger" icon="el-icon-thumb" @click="switchTipOff">举报</el-button>
@@ -48,7 +33,7 @@
       <div>
         <div v-html="blogData.content"></div>
         <div style="margin-top: 20px">
-          <el-tag type="success" v-for="(tag,index) in blogData.tags" :key="index" style="margin-right: 20px">
+          <el-tag type="success" v-for="(tag, index) in blogData.tags" :key="index" style="margin-right: 20px">
             {{ tag }}
           </el-tag>
         </div>
@@ -61,16 +46,9 @@
         </div>
       </div>
       <el-divider><i class="el-icon-s-comment"></i></el-divider>
-      <GlobalComment
-        :blog-id="blogId"
-        :comment="blogData.comment"
-      ></GlobalComment>
+      <GlobalComment :blog-id="blogId" :comment="blogData.comment"></GlobalComment>
     </el-card>
-    <el-dialog
-        title="举报文章"
-        :visible.sync="isShowTipOff"
-        width="30%"
-        >
+    <el-dialog title="举报文章" :visible.sync="isShowTipOff" width="30%">
       <el-input v-model="tipOffReason" placeholder="请输入举报原因" type="textarea"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isShowTipOff = false">取 消</el-button>
@@ -85,9 +63,11 @@ import BlogService from "@/service/BlogService"
 import UserDetailService from "@/service/UserDetailService"
 import GlobalComment from '@/components/Global-Comment'
 import TipOffService from "@/service/TipOffService"
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github.css'
 export default {
   name: "Article-Detail",
-  components:{
+  components: {
     GlobalComment
   },
   data() {
@@ -116,129 +96,136 @@ export default {
     goBack() {
       this.$router.go(-1)
     },
-    switchTipOff(){
+    switchTipOff() {
       this.isShowTipOff = !this.isShowTipOff
-      if (!this.isShowTipOff){
+      if (!this.isShowTipOff) {
         const data = {
-          blogId:this.blogId,
-          description:this.blogData.description,
-          cover:this.blogData.cover,
-          title:this.blogData.title,
-          reason:this.tipOffReason
+          blogId: this.blogId,
+          description: this.blogData.description,
+          cover: this.blogData.cover,
+          title: this.blogData.title,
+          reason: this.tipOffReason
         };
-        TipOffService.tipBlog(data).then(()=>{
+        TipOffService.tipBlog(data).then(() => {
           this.$message.success('举报成功')
         })
       }
     },
-    switchBlackList(){
-      if (this.userData.userDetail.blacklist.includes(this.blogData.author.userName)){
+    switchBlackList() {
+      if (this.userData.userDetail.blacklist.includes(this.blogData.author.userName)) {
         //修改本地sessionStorage数据
         let temData = JSON.parse(sessionStorage.getItem('userData'))
-        temData.userDetail.blacklist.splice(temData.userDetail.blacklist.indexOf(this.blogData.author.userName),1)
+        temData.userDetail.blacklist.splice(temData.userDetail.blacklist.indexOf(this.blogData.author.userName), 1)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
-        this.userData.userDetail.blacklist.splice(this.userData.userDetail.blacklist.indexOf(this.blogData.author.userName),1)
+        this.userData.userDetail.blacklist.splice(this.userData.userDetail.blacklist.indexOf(this.blogData.author.userName), 1)
         UserDetailService.unBlackList({
-          userName:this.blogData.author.userName
-        }).then(rs=>{
-          if (rs.data.status===200){
+          userName: this.blogData.author.userName
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('取消拉黑成功')
-          }else {
+          } else {
             this.$message.error('取消拉黑失败')
           }
         })
-      }else {
+      } else {
         let temData = JSON.parse(sessionStorage.getItem('userData'))
         temData.userDetail.blacklist.push(this.blogData.author.userName)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
         this.userData.userDetail.blacklist.push(this.blogData.author.userName)
         UserDetailService.setBlackList({
-          userName:this.blogData.author.userName
-        }).then(rs=>{
-          if (rs.data.status===200){
+          userName: this.blogData.author.userName
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('拉黑成功')
-          }else {
+          } else {
             this.$message.error('拉黑失败')
           }
         })
       }
     },
-    switchAttentions(){
-      if (this.userData.userDetail.attentions.includes(this.blogData.author.userName)){
+    switchAttentions() {
+      if (this.userData.userDetail.attentions.includes(this.blogData.author.userName)) {
         //修改本地sessionStorage数据
         let temData = JSON.parse(sessionStorage.getItem('userData'))
-        temData.userDetail.attentions.splice(temData.userDetail.attentions.indexOf(this.blogData.author.userName),1)
+        temData.userDetail.attentions.splice(temData.userDetail.attentions.indexOf(this.blogData.author.userName), 1)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
-        this.userData.userDetail.attentions.splice(this.userData.userDetail.attentions.indexOf(this.blogData.author.userName),1)
+        this.userData.userDetail.attentions.splice(this.userData.userDetail.attentions.indexOf(this.blogData.author.userName), 1)
         UserDetailService.unAttentions({
-          userName:this.blogData.author.userName
-        }).then(rs=>{
-          if (rs.data.status===200){
+          userName: this.blogData.author.userName
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('取消关注成功')
-          }else {
+          } else {
             this.$message.error('取消关注失败')
           }
         })
-      }else {
+      } else {
         let temData = JSON.parse(sessionStorage.getItem('userData'))
         temData.userDetail.attentions.push(this.blogData.author.userName)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
         this.userData.userDetail.attentions.push(this.blogData.author.userName)
         UserDetailService.setAttentions({
-          userName:this.blogData.author.userName
-        }).then(rs=>{
-          if (rs.data.status===200){
+          userName: this.blogData.author.userName
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('关注成功')
-          }else {
+          } else {
             this.$message.error('关注失败')
           }
         })
       }
     },
-    switchLike(){
-      if (this.userData.userDetail.likes.includes(this.blogId)){
+    switchLike() {
+      if (this.userData.userDetail.likes.includes(this.blogId)) {
         //修改本地sessionStorage数据
         let temData = JSON.parse(sessionStorage.getItem('userData'))
-        temData.userDetail.likes.splice(temData.userDetail.likes.indexOf(this.blogId),1)
+        temData.userDetail.likes.splice(temData.userDetail.likes.indexOf(this.blogId), 1)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
-        this.userData.userDetail.likes.splice(this.userData.userDetail.likes.indexOf(this.blogId),1)
+        this.userData.userDetail.likes.splice(this.userData.userDetail.likes.indexOf(this.blogId), 1)
         UserDetailService.unLikes({
-          blogId:this.blogId
-        }).then(rs=>{
-          if (rs.data.status===200){
+          blogId: this.blogId
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('取消点赞成功')
-          }else {
+          } else {
             this.$message.error('取消点赞失败')
           }
         })
-      }else {
+      } else {
         let temData = JSON.parse(sessionStorage.getItem('userData'))
         temData.userDetail.likes.push(this.blogId)
         //从本地数据清除用户名
-        sessionStorage.setItem('userData',JSON.stringify(temData))
+        sessionStorage.setItem('userData', JSON.stringify(temData))
         //修改组内数据
         this.userData.userDetail.likes.push(this.blogId)
         UserDetailService.setLikes({
-          blogId:this.blogId
-        }).then(rs=>{
-          if (rs.data.status===200){
+          blogId: this.blogId
+        }).then(rs => {
+          if (rs.data.status === 200) {
             this.$message.success('点赞成功')
-          }else {
+          } else {
             this.$message.error('点赞失败')
           }
         })
       }
     },
+    handlerHighlight() {
+      const blocks = document.querySelectorAll('pre code');
+      if (blocks)
+        blocks.forEach(block => {
+          hljs.highlightElement(block)
+        })
+    }
   },
 
   filters: {
@@ -286,18 +273,26 @@ export default {
       }
     }
   },
+  mounted() {
+    this.$nextTick(() => {
+      this.handlerHighlight();
+    })
+  },
+  updated() {
+    this.$nextTick(() => {
+      this.handlerHighlight();
+    })
+  },
   created() {
     this.blogId = Number(this.$route.params.id)
     BlogService.getBlogByID({
-      blogId:this.blogId
-    }).then(rs=>{
-      console.log('博客的详细数据',rs.data)
+      blogId: this.blogId
+    }).then(rs => {
+      console.log('博客的详细数据', rs.data)
       this.blogData = rs.data.data.blogData
     })
   }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

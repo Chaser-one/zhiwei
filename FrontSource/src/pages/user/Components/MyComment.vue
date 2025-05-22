@@ -57,6 +57,9 @@ export default {
   methods: {
     getBlogData() {
       UserDetailService.getCommentList(this.params).then(rs => {
+        if(rs.data.status !== 200){
+          return
+        }
         this.totalNum = rs.data.data.totalNum;
         this.commentList = rs.data.data.commentList;
       })

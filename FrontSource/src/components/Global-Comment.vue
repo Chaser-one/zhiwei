@@ -55,7 +55,7 @@
          <el-input v-model="commentStr" placeholder="请输入评论内容"></el-input>
        </el-col>
         <el-col :span="24" style="text-align: right;margin-top: 20px">
-          <el-button type="primary" @click="cancelComment(commentItem,'son')">取消</el-button>
+          <el-button type="primary" v-if="commentStr" @click="cancelComment(commentItem,'son')">取消</el-button>
           <el-button type="primary" v-if="commentStr" @click="addComment(commentItem,'son')">回复</el-button>
         </el-col>
       </el-row>
@@ -66,7 +66,7 @@
         <el-input v-model="articleCommentStr" placeholder="请输入评论内容"></el-input>
       </el-col>
       <el-col :span="24" style="text-align: right;margin-top: 20px">
-        <el-button type="primary" @click="cancelComment(localComment,'father')">取消</el-button>
+        <el-button type="primary" v-if="articleCommentStr" @click="cancelComment(localComment,'father')">取消</el-button>
         <el-button type="primary" v-if="articleCommentStr" @click="addComment(localComment,'father')">回复</el-button>
       </el-col>
     </el-row>

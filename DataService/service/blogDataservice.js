@@ -262,6 +262,13 @@ blogApp.get('/getMyBlog', async function (req, res) {
   UserTables.find({
     token: req.headers.authorization
   }).then(async rs => {
+    if(rs.length === 0){
+      res.send({
+        status: 404,
+        message: '用户不存在'
+      })
+      return
+    }
     let totalNum = 0
     await BlogTables.find({
       'author.userName': rs?.[0].userName
@@ -304,6 +311,13 @@ blogApp.get('/getMyLikeBlog', async function (req, res) {
   UserTables.find({
     token: req.headers.authorization
   }).then(async rs => {
+    if(rs.length === 0){
+      res.send({
+        status: 404,
+        message: '用户不存在'
+      })
+      return
+    }
     let totalNum = 0
     let likes = []
     await UserDetailTables.find({
