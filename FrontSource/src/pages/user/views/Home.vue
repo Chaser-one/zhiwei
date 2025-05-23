@@ -111,11 +111,16 @@ export default {
   created() {
     AuthorService.checkPermission().then(rs => {
       if (rs.data.status === 200) {
+        if(rs.data.message == '游客模式'){
+          sessionStorage.removeItem('userData');
+          sessionStorage.setItem('userData', JSON.stringify(rs.data.data.userData));
+          return;
+        }
         this.hasPermission = true
-        this.userData = rs.data.data.userData
-        this.isAdmin = this.userData.isAdmin
-        sessionStorage.removeItem('userData')
-        sessionStorage.setItem('userData', JSON.stringify(this.userData))
+        this.userData = rs.data.data.userData;
+        this.isAdmin = this.userData.isAdmin;
+        sessionStorage.removeItem('userData');
+        sessionStorage.setItem('userData', JSON.stringify(this.userData));
       } else {
         // window.location.replace(`${defaultConfig.hostname}/login.html`)
       }

@@ -93,53 +93,46 @@ authenticationApp.post('/loginUser', function (req, res) {
     }
   })
 })
-authenticationApp.get('/checkPermission', function (req, res) {
+authenticationApp.get('/checkPermission', async function (req, res) {
   let token = req.headers.authorization;
+  let isVisitor = false;
   if (!token) {
-    UserTables.find({
+    let data = await UserTables.findOne({
       userName: '游客'
-    }).then(rs => {
-      if (rs.length) {
-        if (rs[0].password === enCryptData('123456', rs[0].key, 'sha256')) {
-          if (rs[0].approved) {
-            token = rs[0].token;
-          }
-        }
-      } else {
-        res.send({
-          status: 500,
-          message: '用户不存在'
-        })
-      }
     })
+    if (data) {
+      isVisitor = true;
+      token = data.token;
+    } else {
+      res.send({
+        status: 500,
+        message: '游客账号不存在'
+      })
+    }
   }
   UserTables.find({
     token: token
   }).then(async rs => {
     if (rs.length && rs[0].approved) {
-      let userDetail = null;
       let views = 0; //我的文章阅览数
       let likes = 0; //我的文章点赞数
-      await UserDetailTables.find({
+      let userDetail = await UserDetailTables.findOne({
         key: rs[0].key
       }, {
         key: false,
         _id: false,
         __v: false
-      }).then(userDetails => {
-        userDetail = userDetails[0]
       })
-      await BlogTables.find({
+      let blogList = await BlogTables.find({
         'author.userName': rs[0].userName
-      }).then(blogList => {
-        blogList.forEach(blogData => {
-          views += blogData.views
-          likes += blogData.likes
-        })
+      })
+      blogList.forEach(blogData => {
+        views += blogData.views
+        likes += blogData.likes
       })
       res.send({
         status: 200,
-        message: '用户鉴权成功',
+        message: isVisitor ? '游客模式' : '用户鉴权成功',
         data: {
           userData: {
             userName: rs[0].userName,
@@ -205,8 +198,8 @@ authenticationApp.post('/updateUserInfo', async function (req, res) {
   }
   if (req.body.userName) {
     let { avatar } = await UserTables.findOne({
-    token: req.headers.authorization
-  });
+      token: req.headers.authorization
+    });
     await Promise.all([
       UserTables.updateOne({
         _id: _id

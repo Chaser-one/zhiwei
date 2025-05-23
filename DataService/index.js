@@ -3,7 +3,7 @@ let mongoose = require('mongoose')
 let cookieParser = require('cookie-parser')
 let bodyParser = require('body-parser')
 let apiAddr = require('./config/PublicPath')
-// let history = require('connect-history-api-fallback');
+const path = require('path')
 
 //连接数据库
 mongoose.connect('mongodb://localhost:27017/blogDB',{
@@ -20,6 +20,7 @@ let app = express()
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
+app.use(express.static(path.join(__dirname, 'site')))//静态资源托管
 // app.use(history());
 
 // app.use(history({
@@ -70,6 +71,7 @@ app.use(apiAddr.blogApiAddr,blogApp)
 app.use(apiAddr.userDetailApiAddr,userDetailApp)
 app.use(apiAddr.tipOffApiAddr,tipOffApp)
 app.use(apiAddr.websiteDataApiAddr,websiteDataApp)
+
 app.listen(8888)
 
 console.log('后端服务启动')
