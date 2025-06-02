@@ -14,7 +14,7 @@
             <br>
             <span>{{ blogData.lastModified | transformTime }}</span>
           </el-col>
-          <el-col :span="8" :offset="8">
+          <el-col :span="8" :offset="8" v-if="!(userData.userName === '游客')">
             <el-button type="warning"
               :icon="userData.userDetail.likes.includes(blogId) ? 'el-icon-star-on' : 'el-icon-star-off'" circle
               @click="switchLike"></el-button>

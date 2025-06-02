@@ -1,14 +1,15 @@
 <template>
-  <div>
+  <div class="blog_list">
     <el-page-header @back="goBack"></el-page-header>
-    <div style="display: flex;flex-wrap: wrap;margin-top: 20px;">
+    <div class="blog_card">
       <el-card
-          class="box-card"
+          class="card"
           v-for="(articleData, index) in blogList"
           :key="index"
-          style="width: 45%;margin-bottom: 20px;"
+          style="width:100%;"
+          @click.native="goArticleDetail(articleData)"
       >
-        <div slot="header" class="clearfix" @click="goArticleDetail(articleData)">
+        <div slot="header" class="clearfix">
           <span>{{ articleData.title }}</span>
         </div>
         <el-row :gutter="10">
@@ -156,6 +157,7 @@ export default {
       })
     },
     goArticleDetail(articleData){
+      debugger
       this.$router.push(`/article/${articleData.blogId}`)
     }
   }
@@ -163,5 +165,16 @@ export default {
 </script>
 
 <style scoped>
-
+  .blog_list .blog_card{
+    padding:0 10px ;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-gap: 15px;
+  }
+  .blog_list .blog_card .card:hover{
+    border: 2px solid #79beff;
+    cursor: pointer;
+  }
 </style>

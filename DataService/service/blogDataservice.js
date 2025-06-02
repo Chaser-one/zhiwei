@@ -162,10 +162,12 @@ blogApp.post('/comment/create', function (req, res) {
     lastModified: new Date(),
     commentId: v4()
   }
-  UserTables.find({
+  UserTables.findOne({
     token: req.headers.authorization
-  }).then((rs) => {
-    let key = rs[0].key
+  })
+  .then((rs) => {
+    let key = rs.key;
+    if(!key) res.send({status:500,message:'评论失败'})
     UserDetailTables.updateOne({
       key: key,
       comments: {
@@ -179,7 +181,8 @@ blogApp.post('/comment/create', function (req, res) {
           ...commentData
         }
       }
-    }).then(async (rs) => {
+    })
+    .then(async (rs) => {
       if (rs.n < 1) {
         let blogData = {}
         await BlogTables.find({

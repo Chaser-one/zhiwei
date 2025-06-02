@@ -180,6 +180,11 @@ export default {
       }
     },
     addComment(target,type){
+      let userData = JSON.parse(sessionStorage.getItem('userData'));
+      if(userData && userData.userName === '游客'){
+        return this.$message.warning('请先登录');
+      }
+
       let commentData = {
         fatherId:undefined,
         blogId:this.blogId,

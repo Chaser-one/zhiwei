@@ -1,7 +1,14 @@
 const isProduction = process.env.NODE_ENV === 'production';
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+
+// 根据环境获取目标地址
+const getTargetUrl = () => {
+    return isProduction ? 'http://43.136.65.70:8888' : 'http://127.0.0.1:8888';
+};
+
 module.exports = {
     publicPath: '/',
     outputDir: 'site',
@@ -33,6 +40,15 @@ module.exports = {
         overlay: {
             warning: true,
             errors: true
+        },
+        proxy: {
+            '/api': {
+                target: getTargetUrl(),
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/api': '/api/v1'
+                }
+            }
         }
     },
     productionSourceMap: !isProduction, // 生产环境不生成 sourceMap，加快打包速度
@@ -57,7 +73,17 @@ module.exports = {
                             reuseExistingChunk: true
                         }
                     }
-                }
+                },
+                minimizer: [
+                    new TerserPlugin({
+                        terserOptions: {
+                            compress: {
+                                drop_console: true,  // 去除 console
+                                drop_debugger: true  // 去除 debugger
+                            }
+                        }
+                    })
+                ]
             };
             // 开启gzip压缩
             config.plugins = [
@@ -73,6 +99,8 @@ module.exports = {
                     reportFilename: path.resolve(__dirname, './report.html')
                 })
             ];
+        }else{
+            config.devtool = 'source-map';  
         }
     },
     chainWebpack: config => {
